@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "SpeakEasy",
+    "slug": "speakeasy",
+    "scheme": "speakeasy",
+    "version": "1.0.0",
+    "orientation": "default",
+    "userInterfaceStyle": "automatic",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.speakeasy.aac"
+    },
+    "android": {
+      "package": "com.speakeasy.aac",
+      "adaptiveIcon": {
+        "backgroundColor": "#F7F9FC"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      [
+        "expo-file-system",
+        {
+          "supportsOpeningDocumentsInPlace": true,
+          "enableFileSharing": true
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
