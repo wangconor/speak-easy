@@ -11,13 +11,24 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.speakeasy.aac"
+      "bundleIdentifier": "com.speakeasy.aac",
+      "infoPlist": {
+        "NSSpeechRecognitionUsageDescription": "Allow SpeakEasy to recognize speech so it can suggest replies to what you hear.",
+        "NSMicrophoneUsageDescription": "Allow SpeakEasy to use the microphone so it can listen to the conversation and suggest replies.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.speakeasy.aac",
       "adaptiveIcon": {
         "backgroundColor": "#F7F9FC"
-      }
+      },
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.INTERNET",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro"
@@ -42,6 +53,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e924205b-5947-408c-a8a3-0fee82d1bc45"
+      }
     }
   }
 }
