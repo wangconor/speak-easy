@@ -102,7 +102,7 @@ export default function PackDetailScreen() {
         accessibilityLabel="Add phrase"
         icon="plus"
         onPress={() => router.push({ pathname: "/phrase/new", params: { categoryId: pack.id } })}
-        style={[styles.fab, { backgroundColor: theme.colors.primary, bottom: insets.bottom + 24 }]}
+        style={[styles.fab, { backgroundColor: theme.colors.primary, bottom: insets.bottom + 64 }]}
       />
     </View>
   );

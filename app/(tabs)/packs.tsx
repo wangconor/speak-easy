@@ -1,3 +1,4 @@
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -51,6 +52,16 @@ export default function PacksScreen() {
               <Text style={[styles.packTitle, { color: theme.colors.onSurface }]}>{pack.name}</Text>
               <Text style={{ color: theme.colors.onSurfaceVariant }}>{pack.phraseCount} phrases</Text>
             </View>
+            <Pressable
+              accessibilityHint="Opens pack editor"
+              accessibilityLabel={`Edit ${pack.name}`}
+              accessibilityRole="button"
+              hitSlop={10}
+              onPress={() => router.push(`/pack/edit/${pack.id}`)}
+              style={({ pressed }) => [styles.editButton, { opacity: pressed ? 0.5 : 1 }]}
+            >
+              <MaterialCommunityIcons color={theme.colors.onSurfaceVariant} name="pencil-outline" size={20} />
+            </Pressable>
           </Pressable>
         ))}
       </ScrollView>
@@ -59,7 +70,7 @@ export default function PacksScreen() {
         accessibilityLabel="Add pack"
         icon="plus"
         onPress={() => router.push("/pack/new")}
-        style={[styles.fab, { backgroundColor: theme.colors.primary, bottom: insets.bottom + 24 }]}
+        style={[styles.fab, { backgroundColor: theme.colors.primary, bottom: insets.bottom + 64 }]}
       />
     </View>
   );
@@ -120,6 +131,12 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: "700",
     letterSpacing: -0.2
+  },
+  editButton: {
+    alignItems: "center",
+    height: 36,
+    justifyContent: "center",
+    width: 36
   },
   fab: {
     borderRadius: 16,

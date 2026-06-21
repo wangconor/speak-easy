@@ -24,7 +24,7 @@ export function QuickAccessBar() {
       style={[
         styles.wrap,
         {
-          bottom: insets.bottom + (isTabs ? 96 : 14)
+          bottom: insets.bottom + (isTabs ? 56 : 14)
         }
       ]}
     >

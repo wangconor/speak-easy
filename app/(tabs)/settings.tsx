@@ -2,8 +2,9 @@ import Slider from "@react-native-community/slider";
 import { useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Button, Chip, Divider, RadioButton, Switch, Text, useTheme } from "react-native-paper";
+import { Button, Divider, Switch, Text, useTheme } from "react-native-paper";
 
+import { Dropdown } from "@/components/Dropdown";
 import { ScreenState } from "@/components/ScreenState";
 import { languageLabel, voiceLabel } from "@/constants/format";
 import { fonts, spacing } from "@/constants/theme";
@@ -117,35 +118,25 @@ export default function SettingsScreen() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Language</Text>
-        <View style={styles.chipWrap}>
-          {languageOptions.map((language) => (
-            <Chip
-              key={language}
-              selected={settings.language === language}
-              onPress={() => updateSettings({ language, voiceId: null })}
-              style={styles.chip}
-            >
-              {languageLabel(language)}
-            </Chip>
-          ))}
-        </View>
+        <Dropdown
+          accessibilityLabel="Language"
+          onChange={(language) => updateSettings({ language, voiceId: null })}
+          options={languageOptions.map((language) => ({ value: language, label: languageLabel(language) }))}
+          value={settings.language}
+        />
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Voice</Text>
-        <RadioButton.Group
-          onValueChange={(value) => updateSettings({ voiceId: value === "default" ? null : value })}
+        <Dropdown
+          accessibilityLabel="Voice"
+          onChange={(value) => updateSettings({ voiceId: value === "default" ? null : value })}
+          options={[
+            { value: "default", label: "System default" },
+            ...filteredVoices.map((voice) => ({ value: voice.identifier, label: voiceLabel(voice) }))
+          ]}
           value={settings.voiceId ?? "default"}
-        >
-          <RadioButton.Item label="System default" value="default" />
-          {filteredVoices.map((voice) => (
-            <RadioButton.Item
-              key={voice.identifier}
-              label={voiceLabel(voice)}
-              value={voice.identifier}
-            />
-          ))}
-        </RadioButton.Group>
+        />
       </View>
 
       <View style={styles.section}>
@@ -269,15 +260,6 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: "700",
     letterSpacing: -0.2
-  },
-  chipWrap: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8
-  },
-  chip: {
-    borderRadius: 12,
-    minHeight: 44
   },
   sliderHeader: {
     alignItems: "center",
