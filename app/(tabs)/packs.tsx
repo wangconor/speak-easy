@@ -59,7 +59,7 @@ export default function PacksScreen() {
         accessibilityLabel="Add pack"
         icon="plus"
         onPress={() => router.push("/pack/new")}
-        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+        style={[styles.fab, { backgroundColor: theme.colors.primary, bottom: insets.bottom + 24 }]}
       />
     </View>
   );
@@ -123,7 +123,6 @@ const styles = StyleSheet.create({
   },
   fab: {
     borderRadius: 16,
-    bottom: 164,
     position: "absolute",
     right: 18
   }

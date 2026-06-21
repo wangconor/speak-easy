@@ -59,6 +59,21 @@ export type SpeechSettings = {
   pitch: number;
 };
 
+export type ConversationTurn = {
+  // "partner" = the other person (heard via the mic); "me" = the AAC user (a reply they spoke).
+  role: "partner" | "me";
+  text: string;
+};
+
+export type ListenSettings = {
+  // Language to recognize the conversation partner's speech in.
+  language: string;
+  // Automatically fetch AI suggestions when a sentence is finalized.
+  autoSuggest: boolean;
+  // Whether the user has acknowledged the one-time listening/consent notice.
+  hasConsented: boolean;
+};
+
 export type ExportPayload = {
   version: 1;
   exportedAt: string;

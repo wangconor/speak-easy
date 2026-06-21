@@ -31,10 +31,12 @@ export default function SettingsScreen() {
   const {
     ready,
     settings,
+    listen,
     voices,
     phrases,
     patchPhrase,
     updateSettings,
+    updateListenSettings,
     exportData,
     importData
   } = useAppData();
@@ -202,6 +204,29 @@ export default function SettingsScreen() {
             <Switch value={phrase.isQuickAccess} onValueChange={() => handleQuickToggle(phrase)} />
           </View>
         ))}
+      </View>
+
+      <Divider />
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Listen</Text>
+        <View style={styles.switchRow}>
+          <View style={styles.switchCopy}>
+            <Text style={styles.switchLabel}>Suggest replies automatically</Text>
+            <Text numberOfLines={2} style={{ color: theme.colors.onSurfaceVariant }}>
+              Fetch AI suggestions as soon as a sentence is heard.
+            </Text>
+          </View>
+          <Switch
+            value={listen.autoSuggest}
+            onValueChange={(value) => updateListenSettings({ autoSuggest: value })}
+          />
+        </View>
+        {listen.hasConsented ? (
+          <Button mode="text" onPress={() => updateListenSettings({ hasConsented: false })}>
+            Reset listening consent
+          </Button>
+        ) : null}
       </View>
 
       <Divider />

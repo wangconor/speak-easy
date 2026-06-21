@@ -1,8 +1,10 @@
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DraggableFlatList, { RenderItemParams, ScaleDecorator } from "react-native-draggable-flatlist";
 import { FAB, IconButton, Text, useTheme } from "react-native-paper";
 
+import { DetailHeader } from "@/components/DetailHeader";
 import { PhraseCard } from "@/components/PhraseCard";
 import { ScreenState } from "@/components/ScreenState";
 import { fonts, spacing } from "@/constants/theme";
@@ -13,6 +15,7 @@ import type { Phrase } from "@/types";
 
 export default function PackDetailScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const theme = useTheme();
   const { width } = useWindowDimensions();
@@ -60,14 +63,12 @@ export default function PackDetailScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-      <Stack.Screen
-        options={{
-          title: "",
-          headerRight: () =>
-            pack.isDefault ? null : (
-              <IconButton accessibilityLabel="Delete pack" icon="delete" onPress={handleDeletePack} />
-            )
-        }}
+      <DetailHeader
+        right={
+          pack.isDefault ? null : (
+            <IconButton accessibilityLabel="Delete pack" icon="delete" onPress={handleDeletePack} />
+          )
+        }
       />
 
       <DraggableFlatList
@@ -101,7 +102,7 @@ export default function PackDetailScreen() {
         accessibilityLabel="Add phrase"
         icon="plus"
         onPress={() => router.push({ pathname: "/phrase/new", params: { categoryId: pack.id } })}
-        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+        style={[styles.fab, { backgroundColor: theme.colors.primary, bottom: insets.bottom + 24 }]}
       />
     </View>
   );
@@ -144,7 +145,6 @@ const styles = StyleSheet.create({
   },
   fab: {
     borderRadius: 16,
-    bottom: 164,
     position: "absolute",
     right: 18
   }

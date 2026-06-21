@@ -6,6 +6,7 @@ import { EmojiPicker } from "@/components/EmojiPicker";
 import { colorName, languageLabel, resolveColor, voiceLabel } from "@/constants/format";
 import { fonts, phraseColors, spacing } from "@/constants/theme";
 import { useAppData } from "@/context/AppDataContext";
+import { alertDialog } from "@/services/dialog";
 import { speakText } from "@/services/speech";
 import type { PhraseInput } from "@/types";
 
@@ -18,7 +19,7 @@ type PhraseFormProps = {
 
 export function PhraseForm({ initial, submitLabel, onSubmit, onDelete }: PhraseFormProps) {
   const theme = useTheme();
-  const { categories, settings, voices } = useAppData();
+  const { categories, settings, voices, addCategory } = useAppData();
 
   const [text, setText] = useState(initial?.text ?? "");
   const [label, setLabel] = useState(initial?.label ?? "");
@@ -30,6 +31,9 @@ export function PhraseForm({ initial, submitLabel, onSubmit, onDelete }: PhraseF
   const [isPinned, setIsPinned] = useState(Boolean(initial?.isPinned));
   const [isQuickAccess, setIsQuickAccess] = useState(Boolean(initial?.isQuickAccess));
   const [saving, setSaving] = useState(false);
+  const [creatingPack, setCreatingPack] = useState(false);
+  const [newPackName, setNewPackName] = useState("");
+  const [creatingPackBusy, setCreatingPackBusy] = useState(false);
 
   const selectedLanguage = language.trim() || settings.language;
   const filteredVoices = useMemo(() => {
@@ -79,6 +83,24 @@ export function PhraseForm({ initial, submitLabel, onSubmit, onDelete }: PhraseF
     }
   };
 
+  const handleCreatePack = async () => {
+    const name = newPackName.trim();
+    if (!name || creatingPackBusy) {
+      return;
+    }
+    setCreatingPackBusy(true);
+    try {
+      const id = await addCategory({ name });
+      setCategoryId(id);
+      setNewPackName("");
+      setCreatingPack(false);
+    } catch (error) {
+      alertDialog("Could not create pack", error instanceof Error ? error.message : String(error));
+    } finally {
+      setCreatingPackBusy(false);
+    }
+  };
+
   const handleTest = () => {
     if (!text.trim()) {
       return;
@@ -91,7 +113,8 @@ export function PhraseForm({ initial, submitLabel, onSubmit, onDelete }: PhraseF
 
   return (
     <ScrollView
-      contentContainerStyle={[styles.content, { backgroundColor: theme.colors.background }]}
+      style={[styles.screen, { backgroundColor: theme.colors.background }]}
+      contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
     >
       <View style={styles.section}>
@@ -154,7 +177,34 @@ export function PhraseForm({ initial, submitLabel, onSubmit, onDelete }: PhraseF
               {(category.emoji ? `${category.emoji} ` : "") + category.name}
             </Chip>
           ))}
+          <Chip icon="plus" onPress={() => setCreatingPack((value) => !value)} selected={creatingPack} style={styles.chip}>
+            New pack
+          </Chip>
         </View>
+        {creatingPack ? (
+          <View style={styles.newPackRow}>
+            <TextInput
+              accessibilityLabel="New pack name"
+              autoFocus
+              dense
+              label="New pack name"
+              mode="outlined"
+              onChangeText={setNewPackName}
+              onSubmitEditing={handleCreatePack}
+              style={styles.newPackInput}
+              value={newPackName}
+            />
+            <Button
+              disabled={!newPackName.trim() || creatingPackBusy}
+              loading={creatingPackBusy}
+              mode="contained"
+              onPress={handleCreatePack}
+              style={styles.newPackButton}
+            >
+              Create
+            </Button>
+          </View>
+        ) : null}
       </View>
 
       <View style={styles.section}>
@@ -231,7 +281,11 @@ export function PhraseForm({ initial, submitLabel, onSubmit, onDelete }: PhraseF
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1
+  },
   content: {
+    flexGrow: 1,
     gap: spacing.xl,
     padding: spacing.lg,
     paddingBottom: 180
@@ -270,6 +324,17 @@ const styles = StyleSheet.create({
   chip: {
     borderRadius: 10,
     minHeight: 44
+  },
+  newPackRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8
+  },
+  newPackInput: {
+    flex: 1
+  },
+  newPackButton: {
+    borderRadius: 10
   },
   switchRow: {
     alignItems: "center",

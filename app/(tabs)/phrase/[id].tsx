@@ -1,5 +1,8 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { StyleSheet, View } from "react-native";
+import { useTheme } from "react-native-paper";
 
+import { DetailHeader } from "@/components/DetailHeader";
 import { PhraseForm } from "@/components/PhraseForm";
 import { ScreenState } from "@/components/ScreenState";
 import { useAppData } from "@/context/AppDataContext";
@@ -22,6 +25,7 @@ const toInitialInput = (phrase: Phrase): PhraseInput => ({
 
 export default function EditPhraseScreen() {
   const router = useRouter();
+  const theme = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { ready, phrases, savePhrase, removePhrase } = useAppData();
   const phrase = phrases.find((item) => item.id === id);
@@ -61,5 +65,21 @@ export default function EditPhraseScreen() {
     }
   };
 
-  return <PhraseForm initial={toInitialInput(phrase)} onDelete={handleDelete} onSubmit={handleSubmit} submitLabel="Save changes" />;
+  return (
+    <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
+      <DetailHeader title="Edit Phrase" />
+      <PhraseForm
+        initial={toInitialInput(phrase)}
+        onDelete={handleDelete}
+        onSubmit={handleSubmit}
+        submitLabel="Save changes"
+      />
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1
+  }
+});

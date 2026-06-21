@@ -8,7 +8,7 @@ import { PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { QuickAccessBar } from "@/components/QuickAccessBar";
-import { fonts, makePaperTheme } from "@/constants/theme";
+import { makePaperTheme } from "@/constants/theme";
 import { AppDataProvider } from "@/context/AppDataContext";
 
 export default function RootLayout() {
@@ -24,17 +24,10 @@ export default function RootLayout() {
               <Stack
                 screenOptions={{
                   contentStyle: { backgroundColor: theme.colors.background },
-                  headerStyle: { backgroundColor: theme.colors.surface },
-                  headerTintColor: theme.colors.onSurface,
-                  headerShadowVisible: false,
-                  headerTitleStyle: { fontFamily: fonts.display, fontWeight: "700", letterSpacing: -0.2 }
+                  headerShown: false
                 }}
               >
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="phrase/new" options={{ presentation: "modal", title: "Add Phrase" }} />
-                <Stack.Screen name="phrase/[id]" options={{ title: "Edit Phrase" }} />
-                <Stack.Screen name="pack/new" options={{ presentation: "modal", title: "New Pack" }} />
-                <Stack.Screen name="pack/[id]" options={{ title: "Pack" }} />
+                <Stack.Screen name="(tabs)" />
               </Stack>
               <QuickAccessBar />
             </View>

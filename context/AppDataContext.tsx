@@ -20,15 +20,22 @@ import {
   updatePhrase as updatePhraseRecord
 } from "@/services/database";
 import { getAvailableVoices, speakPhrase as speakPhraseOutLoud, speakText as speakTextOutLoud, Voice } from "@/services/speech";
-import type { Category, CategoryInput, HistoryItem, Phrase, PhraseInput, SpeechSettings } from "@/types";
+import type { Category, CategoryInput, HistoryItem, ListenSettings, Phrase, PhraseInput, SpeechSettings } from "@/types";
 
 const SETTINGS_KEY = "speakeasy.speechSettings.v1";
+const LISTEN_KEY = "speakeasy.listenSettings.v1";
 
 export const defaultSpeechSettings: SpeechSettings = {
   language: "en-US",
   voiceId: null,
   rate: 0.95,
   pitch: 1
+};
+
+export const defaultListenSettings: ListenSettings = {
+  language: "en-US",
+  autoSuggest: true,
+  hasConsented: false
 };
 
 type State = {
@@ -39,6 +46,7 @@ type State = {
   phrases: Phrase[];
   history: HistoryItem[];
   settings: SpeechSettings;
+  listen: ListenSettings;
   voices: Voice[];
 };
 
@@ -50,11 +58,13 @@ type Action =
       phrases: Phrase[];
       history: HistoryItem[];
       settings: SpeechSettings;
+      listen: ListenSettings;
       voices: Voice[];
     }
   | { type: "data"; categories: Category[]; phrases: Phrase[]; history: HistoryItem[] }
   | { type: "history"; history: HistoryItem[] }
   | { type: "settings"; settings: SpeechSettings }
+  | { type: "listen"; listen: ListenSettings }
   | { type: "error"; error: string };
 
 type AppDataValue = State & {
@@ -71,6 +81,7 @@ type AppDataValue = State & {
   speakPhrase: (phrase: Phrase) => Promise<void>;
   speakFreeText: (text: string) => Promise<void>;
   updateSettings: (patch: Partial<SpeechSettings>) => Promise<void>;
+  updateListenSettings: (patch: Partial<ListenSettings>) => Promise<void>;
   exportData: () => Promise<string>;
   importData: () => Promise<boolean>;
   clearScratchpadHistory: () => Promise<void>;
@@ -84,6 +95,7 @@ const initialState: State = {
   phrases: [],
   history: [],
   settings: defaultSpeechSettings,
+  listen: defaultListenSettings,
   voices: []
 };
 
@@ -101,6 +113,7 @@ const reducer = (state: State, action: Action): State => {
         phrases: action.phrases,
         history: action.history,
         settings: action.settings,
+        listen: action.listen,
         voices: action.voices
       };
     case "data":
@@ -117,6 +130,8 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, history: action.history };
     case "settings":
       return { ...state, settings: action.settings };
+    case "listen":
+      return { ...state, listen: action.listen };
     case "error":
       return { ...state, loading: false, error: action.error };
     default:
@@ -141,6 +156,23 @@ const normalizeSettings = (value: string | null): SpeechSettings => {
     };
   } catch {
     return defaultSpeechSettings;
+  }
+};
+
+const normalizeListen = (value: string | null): ListenSettings => {
+  if (!value) {
+    return defaultListenSettings;
+  }
+
+  try {
+    const parsed = JSON.parse(value) as Partial<ListenSettings>;
+    return {
+      language: parsed.language || defaultListenSettings.language,
+      autoSuggest: typeof parsed.autoSuggest === "boolean" ? parsed.autoSuggest : defaultListenSettings.autoSuggest,
+      hasConsented: typeof parsed.hasConsented === "boolean" ? parsed.hasConsented : defaultListenSettings.hasConsented
+    };
+  } catch {
+    return defaultListenSettings;
   }
 };
 
@@ -184,11 +216,12 @@ export function AppDataProvider({ children }: PropsWithChildren) {
     dispatch({ type: "loading" });
     try {
       await initializeDatabase();
-      const [categories, phrases, history, storedSettings, voices] = await Promise.all([
+      const [categories, phrases, history, storedSettings, storedListen, voices] = await Promise.all([
         fetchCategories(),
         fetchPhrases(),
         fetchHistory(),
         AsyncStorage.getItem(SETTINGS_KEY),
+        AsyncStorage.getItem(LISTEN_KEY),
         withTimeout(getAvailableVoices().catch(() => []), [])
       ]);
 
@@ -198,6 +231,7 @@ export function AppDataProvider({ children }: PropsWithChildren) {
         phrases,
         history,
         settings: normalizeSettings(storedSettings),
+        listen: normalizeListen(storedListen),
         voices
       });
     } catch (error) {
@@ -317,6 +351,15 @@ export function AppDataProvider({ children }: PropsWithChildren) {
     [state.settings]
   );
 
+  const updateListenSettings = useCallback(
+    async (patch: Partial<ListenSettings>) => {
+      const next = { ...state.listen, ...patch };
+      dispatch({ type: "listen", listen: next });
+      await AsyncStorage.setItem(LISTEN_KEY, JSON.stringify(next));
+    },
+    [state.listen]
+  );
+
   const exportData = useCallback(async () => {
     const payload = await exportLibrary();
     return shareBackupFile(payload);
@@ -355,6 +398,7 @@ export function AppDataProvider({ children }: PropsWithChildren) {
       speakPhrase,
       speakFreeText,
       updateSettings,
+      updateListenSettings,
       exportData,
       importData,
       clearScratchpadHistory
@@ -376,7 +420,8 @@ export function AppDataProvider({ children }: PropsWithChildren) {
       speakFreeText,
       speakPhrase,
       state,
-      updateSettings
+      updateSettings,
+      updateListenSettings
     ]
   );
 

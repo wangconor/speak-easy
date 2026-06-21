@@ -1,5 +1,8 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { StyleSheet, View } from "react-native";
+import { useTheme } from "react-native-paper";
 
+import { DetailHeader } from "@/components/DetailHeader";
 import { PhraseForm } from "@/components/PhraseForm";
 import { useAppData } from "@/context/AppDataContext";
 import { alertDialog } from "@/services/dialog";
@@ -9,6 +12,7 @@ const firstParam = (value: string | string[] | undefined) => (Array.isArray(valu
 
 export default function NewPhraseScreen() {
   const router = useRouter();
+  const theme = useTheme();
   const params = useLocalSearchParams<{ categoryId?: string; text?: string }>();
   const { addPhrase } = useAppData();
   const categoryId = firstParam(params.categoryId);
@@ -24,10 +28,19 @@ export default function NewPhraseScreen() {
   };
 
   return (
-    <PhraseForm
-      initial={{ categoryId: categoryId ?? null, text: text ?? "" }}
-      onSubmit={handleSubmit}
-      submitLabel="Save phrase"
-    />
+    <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
+      <DetailHeader title="Add Phrase" />
+      <PhraseForm
+        initial={{ categoryId: categoryId ?? null, text: text ?? "" }}
+        onSubmit={handleSubmit}
+        submitLabel="Save phrase"
+      />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1
+  }
+});
