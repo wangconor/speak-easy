@@ -73,6 +73,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="phrase/[id]" options={{ href: null }} />
       <Tabs.Screen name="pack/new" options={{ href: null }} />
       <Tabs.Screen name="pack/[id]" options={{ href: null }} />
+      <Tabs.Screen name="pack/edit/[id]" options={{ href: null }} />
     </Tabs>
   );
 }

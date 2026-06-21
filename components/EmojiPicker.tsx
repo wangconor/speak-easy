@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { Text, useTheme } from "react-native-paper";
+import { Button, Menu, Text, useTheme } from "react-native-paper";
 
 const emojiOptions = [
   "⭐",
@@ -31,50 +32,90 @@ type EmojiPickerProps = {
 
 export function EmojiPicker({ selected, onSelect }: EmojiPickerProps) {
   const theme = useTheme();
+  const [visible, setVisible] = useState(false);
+
+  const choose = (emoji: string | null) => {
+    onSelect(emoji);
+    setVisible(false);
+  };
 
   return (
-    <View style={styles.wrap}>
-      <Pressable
-        accessibilityLabel="No emoji"
-        accessibilityRole="button"
-        onPress={() => onSelect(null)}
-        style={[
-          styles.option,
-          {
-            borderColor: selected ? theme.colors.outline : theme.colors.primary,
-            backgroundColor: selected ? theme.colors.surface : theme.colors.primaryContainer
-          }
-        ]}
-      >
-        <Text style={styles.none}>None</Text>
-      </Pressable>
-
-      {emojiOptions.map((emoji) => (
+    <Menu
+      visible={visible}
+      onDismiss={() => setVisible(false)}
+      contentStyle={styles.menu}
+      anchor={
+        <View>
+          <Button
+            accessibilityLabel="Emoji"
+            contentStyle={styles.anchorContent}
+            icon="menu-down"
+            mode="outlined"
+            onPress={() => setVisible(true)}
+            style={styles.anchor}
+          >
+            {selected ? `${selected}  Selected` : "None"}
+          </Button>
+        </View>
+      }
+    >
+      <View style={styles.grid}>
         <Pressable
-          accessibilityLabel={`Emoji ${emoji}`}
+          accessibilityLabel="No emoji"
           accessibilityRole="button"
-          key={emoji}
-          onPress={() => onSelect(emoji)}
+          onPress={() => choose(null)}
           style={[
             styles.option,
             {
-              borderColor: selected === emoji ? theme.colors.primary : theme.colors.outline,
-              backgroundColor: selected === emoji ? theme.colors.primaryContainer : theme.colors.surface
+              borderColor: selected ? theme.colors.outline : theme.colors.primary,
+              backgroundColor: selected ? theme.colors.surface : theme.colors.primaryContainer
             }
           ]}
         >
-          <Text style={styles.emoji}>{emoji}</Text>
+          <Text style={styles.none}>None</Text>
         </Pressable>
-      ))}
-    </View>
+
+        {emojiOptions.map((emoji) => (
+          <Pressable
+            accessibilityLabel={`Emoji ${emoji}`}
+            accessibilityRole="button"
+            key={emoji}
+            onPress={() => choose(emoji)}
+            style={[
+              styles.option,
+              {
+                borderColor: selected === emoji ? theme.colors.primary : theme.colors.outline,
+                backgroundColor: selected === emoji ? theme.colors.primaryContainer : theme.colors.surface
+              }
+            ]}
+          >
+            <Text style={styles.emoji}>{emoji}</Text>
+          </Pressable>
+        ))}
+      </View>
+    </Menu>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: {
+  anchor: {
+    borderRadius: 12
+  },
+  anchorContent: {
+    flexDirection: "row-reverse",
+    justifyContent: "space-between",
+    minHeight: 48,
+    paddingHorizontal: 4
+  },
+  menu: {
+    borderRadius: 14
+  },
+  grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8
+    gap: 8,
+    maxWidth: 288,
+    padding: 12
   },
   option: {
     alignItems: "center",

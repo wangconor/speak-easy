@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { Button, Chip, Divider, RadioButton, Switch, Text, TextInput, useTheme } from "react-native-paper";
+import { Button, Chip, Divider, Switch, Text, TextInput, useTheme } from "react-native-paper";
 
+import { ColorPicker } from "@/components/ColorPicker";
+import { Dropdown } from "@/components/Dropdown";
 import { EmojiPicker } from "@/components/EmojiPicker";
-import { colorName, languageLabel, resolveColor, voiceLabel } from "@/constants/format";
+import { languageLabel, resolveColor, voiceLabel } from "@/constants/format";
 import { fonts, phraseColors, spacing } from "@/constants/theme";
 import { useAppData } from "@/context/AppDataContext";
 import { alertDialog } from "@/services/dialog";
@@ -143,22 +145,7 @@ export function PhraseForm({ initial, submitLabel, onSubmit, onDelete }: PhraseF
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Color</Text>
-        <View style={styles.colorRow}>
-          {phraseColors.map((item) => (
-            <Chip
-              accessibilityLabel={`Color ${item}`}
-              compact={false}
-              key={item}
-              mode={color === item ? "flat" : "outlined"}
-              onPress={() => setColor(item)}
-              selected={color === item}
-              style={[styles.colorChip, { backgroundColor: color === item ? item : theme.colors.surface }]}
-              textStyle={{ color: color === item ? "#FFFFFF" : theme.colors.onSurface }}
-            >
-              {colorName(item)}
-            </Chip>
-          ))}
-        </View>
+        <ColorPicker colors={phraseColors} onSelect={setColor} selected={color} />
       </View>
 
       <View style={styles.section}>
@@ -228,36 +215,29 @@ export function PhraseForm({ initial, submitLabel, onSubmit, onDelete }: PhraseF
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Speech</Text>
         <Text style={styles.fieldLabel}>Language</Text>
-        <View style={styles.chipWrap}>
-          <Chip selected={language.trim() === ""} onPress={() => setLanguage("")} style={styles.chip}>
-            Default
-          </Chip>
-          {languageOptions.map((option) => (
-            <Chip
-              key={option}
-              selected={language.trim() === option}
-              onPress={() => {
-                setLanguage(option);
-                setVoiceId(null);
-              }}
-              style={styles.chip}
-            >
-              {languageLabel(option)}
-            </Chip>
-          ))}
-        </View>
+        <Dropdown
+          accessibilityLabel="Language"
+          onChange={(value) => {
+            setLanguage(value);
+            setVoiceId(null);
+          }}
+          options={[
+            { value: "", label: "Default" },
+            ...languageOptions.map((option) => ({ value: option, label: languageLabel(option) }))
+          ]}
+          value={language.trim()}
+        />
 
         <Text style={styles.fieldLabel}>Voice</Text>
-        <RadioButton.Group onValueChange={(value) => setVoiceId(value === "default" ? null : value)} value={voiceId ?? "default"}>
-          <RadioButton.Item label="Default voice" value="default" />
-          {filteredVoices.map((voice) => (
-            <RadioButton.Item
-              key={voice.identifier}
-              label={voiceLabel(voice)}
-              value={voice.identifier}
-            />
-          ))}
-        </RadioButton.Group>
+        <Dropdown
+          accessibilityLabel="Voice"
+          onChange={(value) => setVoiceId(value === "default" ? null : value)}
+          options={[
+            { value: "default", label: "Default voice" },
+            ...filteredVoices.map((voice) => ({ value: voice.identifier, label: voiceLabel(voice) }))
+          ]}
+          value={voiceId ?? "default"}
+        />
       </View>
 
       <Divider />
@@ -306,15 +286,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     opacity: 0.7
-  },
-  colorRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8
-  },
-  colorChip: {
-    borderRadius: 10,
-    minHeight: 44
   },
   chipWrap: {
     flexDirection: "row",

@@ -1,11 +1,11 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { Button, Chip, Text, TextInput, useTheme } from "react-native-paper";
+import { Button, Text, TextInput, useTheme } from "react-native-paper";
 
+import { ColorPicker } from "@/components/ColorPicker";
 import { DetailHeader } from "@/components/DetailHeader";
 import { EmojiPicker } from "@/components/EmojiPicker";
-import { colorName } from "@/constants/format";
 import { fonts, phraseColors, spacing } from "@/constants/theme";
 import { useAppData } from "@/context/AppDataContext";
 import { alertDialog } from "@/services/dialog";
@@ -62,20 +62,7 @@ export default function NewPackScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Color</Text>
-          <View style={styles.colorRow}>
-            {phraseColors.map((item) => (
-              <Chip
-                key={item}
-                mode={color === item ? "flat" : "outlined"}
-                onPress={() => setColor(item)}
-                selected={color === item}
-                style={[styles.colorChip, { backgroundColor: color === item ? item : theme.colors.surface }]}
-                textStyle={{ color: color === item ? "#FFFFFF" : theme.colors.onSurface }}
-              >
-                {colorName(item)}
-              </Chip>
-            ))}
-          </View>
+          <ColorPicker colors={phraseColors} onSelect={setColor} selected={color} />
         </View>
 
         <Button disabled={!canSave} loading={saving} mode="contained" onPress={handleSave} style={styles.button}>
@@ -104,15 +91,6 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: "700",
     letterSpacing: -0.2
-  },
-  colorRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8
-  },
-  colorChip: {
-    borderRadius: 8,
-    minHeight: 44
   },
   button: {
     borderRadius: 8,
