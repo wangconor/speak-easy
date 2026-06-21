@@ -47,6 +47,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="listen"
+        options={{
+          title: "Listen",
+          tabBarIcon: tabIcon("ear-hearing")
+        }}
+      />
+      <Tabs.Screen
         name="type"
         options={{
           title: "Type",
@@ -60,6 +67,12 @@ export default function TabsLayout() {
           tabBarIcon: tabIcon("tune")
         }}
       />
+      {/* Detail/form screens live inside the tab navigator so the bottom tab bar
+          stays visible. href: null keeps them out of the tab bar itself. */}
+      <Tabs.Screen name="phrase/new" options={{ href: null }} />
+      <Tabs.Screen name="phrase/[id]" options={{ href: null }} />
+      <Tabs.Screen name="pack/new" options={{ href: null }} />
+      <Tabs.Screen name="pack/[id]" options={{ href: null }} />
     </Tabs>
   );
 }

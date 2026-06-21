@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Button, Chip, Text, TextInput, useTheme } from "react-native-paper";
 
+import { DetailHeader } from "@/components/DetailHeader";
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { colorName } from "@/constants/format";
 import { fonts, phraseColors, spacing } from "@/constants/theme";
@@ -41,49 +42,56 @@ export default function NewPackScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={[styles.content, { backgroundColor: theme.colors.background }]} keyboardShouldPersistTaps="handled">
-      <View style={styles.section}>
-        <TextInput
-          accessibilityLabel="Pack name"
-          label="Pack name"
-          mode="outlined"
-          onChangeText={setName}
-          value={name}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Emoji</Text>
-        <EmojiPicker selected={emoji} onSelect={setEmoji} />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Color</Text>
-        <View style={styles.colorRow}>
-          {phraseColors.map((item) => (
-            <Chip
-              key={item}
-              mode={color === item ? "flat" : "outlined"}
-              onPress={() => setColor(item)}
-              selected={color === item}
-              style={[styles.colorChip, { backgroundColor: color === item ? item : theme.colors.surface }]}
-              textStyle={{ color: color === item ? "#FFFFFF" : theme.colors.onSurface }}
-            >
-              {colorName(item)}
-            </Chip>
-          ))}
+    <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
+      <DetailHeader title="New Pack" />
+      <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <View style={styles.section}>
+          <TextInput
+            accessibilityLabel="Pack name"
+            label="Pack name"
+            mode="outlined"
+            onChangeText={setName}
+            value={name}
+          />
         </View>
-      </View>
 
-      <Button disabled={!canSave} loading={saving} mode="contained" onPress={handleSave} style={styles.button}>
-        Save pack
-      </Button>
-    </ScrollView>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Emoji</Text>
+          <EmojiPicker selected={emoji} onSelect={setEmoji} />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Color</Text>
+          <View style={styles.colorRow}>
+            {phraseColors.map((item) => (
+              <Chip
+                key={item}
+                mode={color === item ? "flat" : "outlined"}
+                onPress={() => setColor(item)}
+                selected={color === item}
+                style={[styles.colorChip, { backgroundColor: color === item ? item : theme.colors.surface }]}
+                textStyle={{ color: color === item ? "#FFFFFF" : theme.colors.onSurface }}
+              >
+                {colorName(item)}
+              </Chip>
+            ))}
+          </View>
+        </View>
+
+        <Button disabled={!canSave} loading={saving} mode="contained" onPress={handleSave} style={styles.button}>
+          Save pack
+        </Button>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1
+  },
   content: {
+    flexGrow: 1,
     gap: spacing.xl,
     padding: spacing.lg,
     paddingBottom: 180
